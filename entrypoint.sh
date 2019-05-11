@@ -12,8 +12,8 @@ if [[ -z "$GITHUB_SHA" ]]; then
 fi
 
 # ssh related
-if [[ -z "$USER" ]]; then
-	echo "Set the USER env variable."
+if [[ -z "$SSH_USER" ]]; then
+	echo "Set the SSH_USER env variable."
 	exit 1
 fi
 if [[ -z "$PRIVATE_KEY" ]]; then
