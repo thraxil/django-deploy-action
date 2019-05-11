@@ -72,6 +72,7 @@ ssh_cmd="ssh -o StrictHostKeyChecking=no -i $SSH_PATH/deploy_key"
 
 for h in "${hosts[@]}"
 do
+		echo $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     $ssh_cmd $SSH_USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
     $ssh_cmd $SSH_USER@$h "echo export TAG=${GITHUB_SHA} > /var/www/$APP/TAG"
