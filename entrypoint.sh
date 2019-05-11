@@ -68,7 +68,7 @@ hosts=(${WEB_HOSTS})
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
-ssh_cmd="ssh -o StrictHostKeyChecking=no -i $SSH_PATH/deploy_key.pub"
+ssh_cmd="ssh -o StrictHostKeyChecking=no -i $SSH_PATH/deploy_key"
 
 for h in "${hosts[@]}"
 do
