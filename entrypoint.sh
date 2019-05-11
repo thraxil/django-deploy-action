@@ -1,13 +1,52 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
+
+#### check that we have the vars needed
+
+# GITHUB set ones
+
+if [[ -z "$GITHUB_SHA" ]]; then
+	echo "Set the GITHUB_SHA env variable."
+	exit 1
+fi
+
+# ssh related
+if [[ -z "$USER" ]]; then
+	echo "Set the USER env variable."
+	exit 1
+fi
+if [[ -z "$PRIVATE_KEY" ]]; then
+	echo "Set the PRIVATE_KEY env variable."
+	exit 1
+fi
+if [[ -z "$PUBLIC_KEY" ]]; then
+	echo "Set the PUBLIC_KEY env variable."
+	exit 1
+fi
+
+# others
+if [[ -z "$APP" ]]; then
+	echo "Set the APP env variable."
+	exit 1
+fi
+if [[ -z "$WEB_HOSTS" ]]; then
+	echo "Set the WEB_HOSTS env variable."
+	exit 1
+fi
+# TODO: make this one optional
+if [[ -z "$SENTRY_URL" ]]; then
+	echo "Set the SENTRY_URL env variable."
+	exit 1
+fi
+
 
 #### get ssh stuff ready
 
 SSH_PATH="$HOME/.ssh"
 
 mkdir "$SSH_PATH"
-touch "$SSH_PATH/known_hosts"
+mv /known_hosts "$SSH_PATH/known_hosts"
 
 echo "$PRIVATE_KEY" > "$SSH_PATH/deploy_key"
 echo "$PUBLIC_KEY" > "$SSH_PATH/deploy_key.pub"
@@ -20,8 +59,6 @@ chmod 600 "$SSH_PATH/deploy_key.pub"
 eval $(ssh-agent)
 ssh-add "$SSH_PATH/deploy_key"
 
-mv /known_hosts "$SSH_PATH/known_hosts"
-
 #### deploy to hosts
 
 hosts=(${WEB_HOSTS})
@@ -30,23 +67,23 @@ bhosts=(${BEAT_HOSTS})
 
 for h in "${hosts[@]}"
 do
-    ssh $USER@$h docker pull ${REPOSITORY}thraxil/$APP:$TAG
+    ssh $USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     ssh $USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
-    ssh $USER@$h "echo export TAG=$TAG > /var/www/$APP/TAG"
+    ssh $USER@$h "echo export TAG=${GITHUB_SHA} > /var/www/$APP/TAG"
 done
 
 for h in "${chosts[@]}"
 do
-    ssh $USER@$h docker pull ${REPOSITORY}thraxil/$APP:$TAG
+    ssh $USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     ssh $USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
-    ssh $USER@$h "echo export TAG=$TAG > /var/www/$APP/TAG"
+    ssh $USER@$h "echo export TAG=${GITHUB_SHA} > /var/www/$APP/TAG"
 done
 
 for h in "${bhosts[@]}"
 do
-    ssh $USER@$h docker pull ${REPOSITORY}thraxil/$APP:$TAG
+    ssh $USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     ssh $USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
-    ssh $USER@$h "echo export TAG=$TAG > /var/www/$APP/TAG"
+    ssh $USER@$h "echo export TAG=${GITHUB_SHA} > /var/www/$APP/TAG"
 done
 
 # run some tasks on just one of the hosts
@@ -77,9 +114,8 @@ do
 done
 
 # sentry release
-COMMIT=$(git log -n 1 --pretty=format:'%H')
 
 curl ${SENTRY_URL} \
   -X POST \
   -H "Content-Type: application/json" \
-  -d "{\\\"version\\\": \\\"${COMMIT}\\\"}"
+  -d "{\\\"version\\\": \\\"${GITHUB_SHA}\\\"}"
