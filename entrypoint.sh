@@ -56,6 +56,8 @@ chmod 600 "$SSH_PATH/known_hosts"
 chmod 600 "$SSH_PATH/deploy_key"
 chmod 600 "$SSH_PATH/deploy_key.pub"
 
+more $SSH_PATH/known_hosts
+
 #eval $(ssh-agent)
 #ssh-add "$SSH_PATH/deploy_key"
 
@@ -65,7 +67,7 @@ hosts=(${WEB_HOSTS})
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
-ssh_cmd="ssh -i $SSH_PATH/deploy_key.pub"
+ssh_cmd="ssh -o StrictHostKeyChecking=no -i $SSH_PATH/deploy_key.pub"
 
 for h in "${hosts[@]}"
 do
