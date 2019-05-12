@@ -49,21 +49,10 @@ mkdir "$SSH_PATH"
 mv /known_hosts "$SSH_PATH/known_hosts"
 
 echo "$PRIVATE_KEY" > "$SSH_PATH/deploy_key"
-#echo "$PUBLIC_KEY" > "$SSH_PATH/deploy_key.pub"
 
 chmod 700 "$SSH_PATH"
 chmod 600 "$SSH_PATH/known_hosts"
 chmod 600 "$SSH_PATH/deploy_key"
-#chmod 600 "$SSH_PATH/deploy_key.pub"
-
-more $SSH_PATH/known_hosts
-md5sum $SSH_PATH/deploy_key
-ls -l $HOME
-ls -l $SSH_PATH
-echo $SSH_USER
-
-#eval $(ssh-agent)
-#ssh-add "$SSH_PATH/deploy_key"
 
 #### deploy to hosts
 
@@ -71,7 +60,7 @@ hosts=(${WEB_HOSTS})
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
-ssh_cmd="ssh -vvvv -i $SSH_PATH/deploy_key"
+ssh_cmd="ssh -i $SSH_PATH/deploy_key"
 
 for h in "${hosts[@]}"
 do
@@ -127,4 +116,4 @@ done
 curl ${SENTRY_URL} \
   -X POST \
   -H "Content-Type: application/json" \
-  -d "{\\\"version\\\": \\\"${GITHUB_SHA}\\\"}"
+  -d "{\"version\": \"${GITHUB_SHA}\"}"
