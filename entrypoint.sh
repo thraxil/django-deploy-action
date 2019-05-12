@@ -71,7 +71,7 @@ hosts=(${WEB_HOSTS})
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
-ssh_cmd="ssh -vvvv -tt -o UserKnownHostsFile=$SSH_PATH/known_hosts -i $SSH_PATH/deploy_key"
+ssh_cmd="ssh -vvvv -T -o UserKnownHostsFile=$SSH_PATH/known_hosts -i $SSH_PATH/deploy_key"
 
 for h in "${hosts[@]}"
 do
