@@ -49,12 +49,12 @@ mkdir "$SSH_PATH"
 mv /known_hosts "$SSH_PATH/known_hosts"
 
 echo "$PRIVATE_KEY" > "$SSH_PATH/deploy_key"
-echo "$PUBLIC_KEY" > "$SSH_PATH/deploy_key.pub"
+#echo "$PUBLIC_KEY" > "$SSH_PATH/deploy_key.pub"
 
 chmod 700 "$SSH_PATH"
 chmod 600 "$SSH_PATH/known_hosts"
 chmod 600 "$SSH_PATH/deploy_key"
-chmod 600 "$SSH_PATH/deploy_key.pub"
+#chmod 600 "$SSH_PATH/deploy_key.pub"
 
 more $SSH_PATH/known_hosts
 echo $SSH_USER
