@@ -34,12 +34,6 @@ if [[ -z "$WEB_HOSTS" ]]; then
 	echo "Set the WEB_HOSTS env variable."
 	exit 1
 fi
-# TODO: make this one optional
-if [[ -z "$SENTRY_URL" ]]; then
-	echo "Set the SENTRY_URL env variable."
-	exit 1
-fi
-
 
 #### get ssh stuff ready
 
@@ -96,10 +90,3 @@ do
     $ssh_cmd $SSH_USER@$h sudo systemctl stop $APP-beat.service || true
     $ssh_cmd $SSH_USER@$h sudo systemctl start $APP-beat.service
 done
-
-# sentry release
-
-curl ${SENTRY_URL} \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d "{\"version\": \"${GITHUB_SHA}\"}"
