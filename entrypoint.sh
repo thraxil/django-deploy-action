@@ -7,32 +7,33 @@ set -e
 # GITHUB set ones
 
 if [[ -z "$GITHUB_SHA" ]]; then
-	echo "Set the GITHUB_SHA env variable."
-	exit 1
+  echo "Set the GITHUB_SHA env variable."
+  exit 1
 fi
 
 # ssh related
 if [[ -z "$SSH_USER" ]]; then
-	echo "Set the SSH_USER env variable."
-	exit 1
+  # probably not ssh-ing as root
+  echo "Set the SSH_USER env variable."
+  exit 1
 fi
 if [[ -z "$PRIVATE_KEY" ]]; then
-	echo "Set the PRIVATE_KEY env variable."
-	exit 1
+  echo "Set the PRIVATE_KEY env variable."
+  exit 1
 fi
-if [[ -z "$PUBLIC_KEY" ]]; then
-	echo "Set the PUBLIC_KEY env variable."
-	exit 1
+if [[ -z "$KNOWN_HOSTS" ]]; then
+  echo "Set the KNOWN_HOSTS env variable."
+  exit 1
 fi
 
 # others
 if [[ -z "$APP" ]]; then
-	echo "Set the APP env variable."
-	exit 1
+  echo "Set the APP env variable."
+  exit 1
 fi
 if [[ -z "$WEB_HOSTS" ]]; then
-	echo "Set the WEB_HOSTS env variable."
-	exit 1
+  echo "Set the WEB_HOSTS env variable."
+  exit 1
 fi
 
 #### get ssh stuff ready
@@ -40,24 +41,24 @@ fi
 SSH_PATH="/root/.ssh"
 
 mkdir "$SSH_PATH"
-mv /known_hosts "$SSH_PATH/known_hosts"
 
+echo "$KNOWN_HOSTS" > "$SSH_PATH/known_hosts"
 echo "$PRIVATE_KEY" > "$SSH_PATH/deploy_key"
 
 chmod 700 "$SSH_PATH"
 chmod 600 "$SSH_PATH/known_hosts"
 chmod 600 "$SSH_PATH/deploy_key"
 
+ssh_cmd="ssh -i $SSH_PATH/deploy_key"
+
 #### deploy to hosts
 
-ALL_HOSTS=($(echo "${WEB_HOSTS} ${CHOSTS} ${BHOSTS}" | tr ' ' '\n' | sort -u))
-hosts=(${WEB_HOSTS})
+# all of them (unique) in one list
+hosts=($(echo "${WEB_HOSTS} ${CHOSTS} ${BHOSTS}" | tr ' ' '\n' | sort -u))
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
-ssh_cmd="ssh -i $SSH_PATH/deploy_key"
-
-for h in "${ALL_HOSTS[@]}"
+for h in "${hosts[@]}"
 do
     $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     $ssh_cmd $SSH_USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
