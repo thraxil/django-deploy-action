@@ -58,6 +58,7 @@ chmod 600 "$SSH_PATH/deploy_key"
 
 more $SSH_PATH/known_hosts
 md5sum $SSH_PATH/deploy_key
+ls -l $HOME
 ls -l $SSH_PATH
 echo $SSH_USER
 
@@ -70,7 +71,7 @@ hosts=(${WEB_HOSTS})
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
-ssh_cmd="ssh -vvvv -o StrictHostKeyChecking=no -i $SSH_PATH/deploy_key"
+ssh_cmd="ssh -vvvv -tt -o UserKnownHostsFile=$SSH_PATH/known_hosts -i $SSH_PATH/deploy_key"
 
 for h in "${hosts[@]}"
 do
