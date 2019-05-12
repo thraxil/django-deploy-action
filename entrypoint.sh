@@ -56,28 +56,14 @@ chmod 600 "$SSH_PATH/deploy_key"
 
 #### deploy to hosts
 
+ALL_HOSTS=($(echo "${WEB_HOSTS} ${CHOSTS} ${BHOSTS}" | tr ' ' '\n' | sort -u))
 hosts=(${WEB_HOSTS})
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
 ssh_cmd="ssh -i $SSH_PATH/deploy_key"
 
-for h in "${hosts[@]}"
-do
-		echo $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
-    $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
-    $ssh_cmd $SSH_USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
-    $ssh_cmd $SSH_USER@$h "echo export TAG=${GITHUB_SHA} > /var/www/$APP/TAG"
-done
-
-for h in "${chosts[@]}"
-do
-    $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
-    $ssh_cmd $SSH_USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
-    $ssh_cmd $SSH_USER@$h "echo export TAG=${GITHUB_SHA} > /var/www/$APP/TAG"
-done
-
-for h in "${bhosts[@]}"
+for h in "${ALL_HOSTS[@]}"
 do
     $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     $ssh_cmd $SSH_USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
