@@ -57,6 +57,8 @@ chmod 600 "$SSH_PATH/deploy_key"
 #chmod 600 "$SSH_PATH/deploy_key.pub"
 
 more $SSH_PATH/known_hosts
+md5sum $SSH_PATH/deploy_key
+ls -l $SSH_PATH
 echo $SSH_USER
 
 #eval $(ssh-agent)
