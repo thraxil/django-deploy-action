@@ -60,6 +60,7 @@ bhosts=(${BEAT_HOSTS})
 
 for h in "${hosts[@]}"
 do
+    echo "pulling and updating tag on $h to ${GITHUB_SHA}"
     $ssh_cmd $SSH_USER@$h docker pull ${REPOSITORY}thraxil/$APP:${GITHUB_SHA}
     $ssh_cmd $SSH_USER@$h cp /var/www/$APP/TAG /var/www/$APP/REVERT || true
     $ssh_cmd $SSH_USER@$h "echo export TAG=${GITHUB_SHA} > /var/www/$APP/TAG"
@@ -76,18 +77,21 @@ $ssh_cmd $SSH_USER@$h /usr/local/bin/docker-runner $APP compress
 
 for h in "${hosts[@]}"
 do
+    echo "restarting gunicorn on $h"
     $ssh_cmd $SSH_USER@$h sudo systemctl stop $APP.service || true
     $ssh_cmd $SSH_USER@$h sudo systemctl start $APP.service
 done
 
 for h in "${chosts[@]}"
 do
+    echo "restarting celery worker on $h"
     $ssh_cmd $SSH_USER@$h sudo systemctl stop $APP-worker.service || true
     $ssh_cmd $SSH_USER@$h sudo systemctl start $APP-worker.service
 done
 
 for h in "${bhosts[@]}"
 do
+    echo "restarting celery beat on $h"
     $ssh_cmd $SSH_USER@$h sudo systemctl stop $APP-beat.service || true
     $ssh_cmd $SSH_USER@$h sudo systemctl start $APP-beat.service
 done
