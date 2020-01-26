@@ -58,6 +58,11 @@ hosts=($(echo "${WEB_HOSTS} ${CHOSTS} ${BHOSTS}" | tr ' ' '\n' | sort -u))
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
+echo "WEB_HOSTS: ${WEB_HOSTS}"
+echo "CHOSTS: ${CHOSTS}"
+echo "BHOSTS: ${BHOSTS}"
+echo "all hosts: ${hosts}"
+
 for h in "${hosts[@]}"
 do
     echo "pulling and updating tag on $h to ${GITHUB_SHA}"
