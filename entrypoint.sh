@@ -55,6 +55,7 @@ ssh_cmd="ssh -i $SSH_PATH/deploy_key"
 
 # all of them (unique) in one list
 hosts=($(echo "${WEB_HOSTS} ${CELERY_HOSTS} ${BEAT_HOSTS}" | tr ' ' '\n' | sort -u))
+whosts=(${WEB_HOSTS})
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
@@ -80,7 +81,7 @@ $ssh_cmd $SSH_USER@$h /usr/local/bin/docker-runner $APP compress
 
 # restart everything
 
-for h in "${hosts[@]}"
+for h in "${whosts[@]}"
 do
     echo "restarting gunicorn on $h"
     $ssh_cmd $SSH_USER@$h sudo systemctl stop $APP.service || true
