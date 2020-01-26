@@ -54,13 +54,13 @@ ssh_cmd="ssh -i $SSH_PATH/deploy_key"
 #### deploy to hosts
 
 # all of them (unique) in one list
-hosts=($(echo "${WEB_HOSTS} ${CHOSTS} ${BHOSTS}" | tr ' ' '\n' | sort -u))
+hosts=($(echo "${WEB_HOSTS} ${CELERY_HOSTS} ${BEAT_HOSTS}" | tr ' ' '\n' | sort -u))
 chosts=(${CELERY_HOSTS})
 bhosts=(${BEAT_HOSTS})
 
 echo "WEB_HOSTS: ${WEB_HOSTS}"
-echo "CHOSTS: ${CHOSTS}"
-echo "BHOSTS: ${BHOSTS}"
+echo "CHOSTS: ${CELERY_HOSTS}"
+echo "BHOSTS: ${BEAT_HOSTS}"
 echo "all hosts: ${hosts}"
 
 for h in "${hosts[@]}"
